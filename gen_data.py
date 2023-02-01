@@ -156,7 +156,7 @@ def inject_waveform_to_timeseries(noise_timeseries, this_detector, ra, dec, pol,
 def save_data_and_generate_log_file(OUT_DIR, out_name, out_logfile, strain_with_injection, PSD_DIR, PSD_FNAME, 
 															gps_start, duration, 
 															ra, dec, pol, inc, distance, 
-															mass1, mass2, injection_time):
+															mass1, mass2, injection_time, multi_inj = False):
 	"""
 	This will save everything and also create a log file so you know what inputs you made
 	"""
@@ -167,18 +167,19 @@ def save_data_and_generate_log_file(OUT_DIR, out_name, out_logfile, strain_with_
 	# this file can then be re-loaded with PyCBC in the future
 	strain_with_injection.save(out_fname)
 
-	out_labels = np.asarray(['filename:', 'psd:', 'gps_segment_start:', 'duration:',
-					'ra:', 'dec:', 'polarization:', 'inclination:', 'distance:', 
-					'mass1:', 'mass2:', 'injection_time:'])
-	out_vals = [out_fname, os.path.join(PSD_DIR, PSD_FNAME), gps_start, duration, ra, dec, pol, inc, distance, 
-				mass1, mass2, injection_time]
+	if multi_inj == False:
+		out_labels = np.asarray(['filename:', 'psd:', 'gps_segment_start:', 'duration:',
+						'ra:', 'dec:', 'polarization:', 'inclination:', 'distance:', 
+						'mass1:', 'mass2:', 'injection_time:'])
+		out_vals = [out_fname, os.path.join(PSD_DIR, PSD_FNAME), gps_start, duration, ra, dec, pol, inc, distance, 
+					mass1, mass2, injection_time]
 
 
-	logfile_fname = os.path.join(OUT_DIR, out_logfile)
+		logfile_fname = os.path.join(OUT_DIR, out_logfile)
 
-	out_df = pd.DataFrame(np.column_stack([out_labels, out_vals]))
-	if not os.path.isfile(logfile_fname+'.csv'):
-		out_df.to_csv(logfile_fname+'.csv', index=False, index_label=None, header = False)
+		out_df = pd.DataFrame(np.column_stack([out_labels, out_vals]))
+		if not os.path.isfile(logfile_fname+'.csv'):
+			out_df.to_csv(logfile_fname+'.csv', index=False, index_label=None, header = False)
 	return print('saved all files!')
 
 
@@ -287,101 +288,171 @@ else:
 
 #----- Generate low SNR test example: -----#
 
-lowSNR_example_gps = 1243350018
-lowSNR_example_seed = 124
-duration = 128
-ra = 0.2
-dec = 1.5
-pol = 0.1
-inc = 0.
-distance = 2400
-mass1 = 75
-mass2 = 40
-lowSNR_example_injection_time = 45
-lowSNR_example_fname = 'lowSNR_example_timeseries_'
-lowSNR_example_fname_log = 'lowSNR_out_logfile_example'
+# lowSNR_example_gps = 1243350018
+# lowSNR_example_seed = 124
+# duration = 128
+# ra = 0.2
+# dec = 1.5
+# pol = 0.1
+# inc = 0.
+# distance = 2400
+# mass1 = 75
+# mass2 = 40
+# lowSNR_example_injection_time = 45
+# lowSNR_example_fname = 'lowSNR_example_timeseries_'
+# lowSNR_example_fname_log = 'lowSNR_out_logfile_example'
 
 
-L1_lowSNR_example_timeseries = generate_noise_timeseries(PSD_DIR, PSD_fnames[1], lowSNR_example_gps, duration, 
-															random_seed = lowSNR_example_seed, f_low = 10.0, 
-															delta_f = 0.25, fmax = 4096, 
-															is_asd_file=True, plot_psd = False,
-															plot_timeseries = False)
+# L1_lowSNR_example_timeseries = generate_noise_timeseries(PSD_DIR, PSD_fnames[1], lowSNR_example_gps, duration, 
+# 															random_seed = lowSNR_example_seed, f_low = 10.0, 
+# 															delta_f = 0.25, fmax = 4096, 
+# 															is_asd_file=True, plot_psd = False,
+# 															plot_timeseries = False)
 
-H1_lowSNR_example_timeseries = generate_noise_timeseries(PSD_DIR, PSD_fnames[0], lowSNR_example_gps, duration, 
-															random_seed = lowSNR_example_seed, f_low = 10.0, 
-															delta_f = 0.25, fmax = 4096, 
-															is_asd_file=True, plot_psd = False,
-															plot_timeseries = False)
+# H1_lowSNR_example_timeseries = generate_noise_timeseries(PSD_DIR, PSD_fnames[0], lowSNR_example_gps, duration, 
+# 															random_seed = lowSNR_example_seed, f_low = 10.0, 
+# 															delta_f = 0.25, fmax = 4096, 
+# 															is_asd_file=True, plot_psd = False,
+# 															plot_timeseries = False)
 
-L1_lowSNR_with_injection = inject_waveform_to_timeseries(L1_lowSNR_example_timeseries, "L1",
-													 ra, dec, pol, inc, distance, 
-													mass1, mass2, lowSNR_example_gps, lowSNR_example_injection_time)
-H1_lowSNR_with_injection = inject_waveform_to_timeseries(H1_lowSNR_example_timeseries, "H1",
-													 ra, dec, pol, inc, distance, 
-													mass1, mass2, lowSNR_example_gps, lowSNR_example_injection_time)
+# L1_lowSNR_with_injection = inject_waveform_to_timeseries(L1_lowSNR_example_timeseries, "L1",
+# 													 ra, dec, pol, inc, distance, 
+# 													mass1, mass2, lowSNR_example_gps, lowSNR_example_injection_time)
+# H1_lowSNR_with_injection = inject_waveform_to_timeseries(H1_lowSNR_example_timeseries, "H1",
+# 													 ra, dec, pol, inc, distance, 
+# 													mass1, mass2, lowSNR_example_gps, lowSNR_example_injection_time)
 
-for this_timeseries, this_detector, this_psd in zip([L1_lowSNR_with_injection, H1_lowSNR_with_injection], 
-													['L1', 'H1'], [PSD_fnames[1], PSD_fnames[0]]):
+# for this_timeseries, this_detector, this_psd in zip([L1_lowSNR_with_injection, H1_lowSNR_with_injection], 
+# 													['L1', 'H1'], [PSD_fnames[1], PSD_fnames[0]]):
 
-	save_data_and_generate_log_file(OUT_DIR, lowSNR_example_fname+this_detector, lowSNR_example_fname_log, 
-									this_timeseries, PSD_DIR, this_psd, 
-									lowSNR_example_gps, duration, 
-									ra, dec, pol, inc, distance, 
-									mass1, mass2, lowSNR_example_injection_time )
+# 	save_data_and_generate_log_file(OUT_DIR, lowSNR_example_fname+this_detector, lowSNR_example_fname_log, 
+# 									this_timeseries, PSD_DIR, this_psd, 
+# 									lowSNR_example_gps, duration, 
+# 									ra, dec, pol, inc, distance, 
+# 									mass1, mass2, lowSNR_example_injection_time )
 
 
 #----- Generate the challenge: -----#
 
-# challenge_gps = 1243350018
-# challenge_seed = 129
-# duration = 512
+challenge_gps = 1243350018
+challenge_seed = 129
+duration = 256
+
+# # generate injection times
+# how many injections to generate
+n_injections = 20
+
+# give at least 10 second buffer at start and end
+valid_times = [10, 256-10]
+
+# how long do you have to inject over if they were equally spaced?
+inj_segment_len = (valid_times[1] - valid_times[0]) / n_injections
+
+# calculate the initial injection time and then do everything iteratively
+injection_times = []
+init_injection_time = np.random.uniform(valid_times[0], valid_times[0] + inj_segment_len)
+injection_times.append(init_injection_time)
+for i in range(n_injections - 1):
+	# add 2 second buffer at the beginning of each
+	this_injection_time = np.random.uniform(injection_times[i] + 3, injection_times[i] + inj_segment_len + 3)
+	injection_times.append(this_injection_time)
+
+# check that the last injection time is still within the segment length:
+if max(injection_times) > valid_times[1]:
+	print('WARNING! Last injection after end of valid segment!')
+
+
 
 # # set up some random injection parameters
-# # these will all be uniform distributions
-# ra = 1.7
-# dec = 1.7
-# pol = 0.4
-# inc = 1
-# distance = np.random.uniform(150, 1500, 20)
-# mass1 = 30
-# mass2 = 30
+# # make them uniform
+ra = np.random.uniform(0, np.pi * 2, n_injections)
+dec = np.random.uniform(- np.pi / 2, np.pi / 2, n_injections)
+pol = np.random.uniform(0, np.pi * 2, n_injections)
+inc = np.random.uniform(0, np.pi * 2, n_injections)
+distance = np.random.uniform(300, 3000, n_injections)
+mass1 = np.random.uniform(20, 100, n_injections)
+mass2 = np.random.uniform(20, 100, n_injections)
+spin1z = np.random.uniform(0, 1, n_injections)
+spin2z = np.random.uniform(0, 1, n_injections)
 
-# # generate injection times between 5 seconds and 500 seconds
-# # do this iteratively so none of them overlap - give at least 15 seconds
-# # between injections
-# injection_times = 40
+apx = "IMRPhenomD"
+
+# load the PSDs as it is needed
+L1_psd = pycbc.psd.from_txt(os.path.join(PSD_DIR, PSD_fnames[1]), int(4096/0.25) + 1, 0.25,
+                         20, is_asd_file=True)
+
+H1_psd = pycbc.psd.from_txt(os.path.join(PSD_DIR, PSD_fnames[1]), int(4096/0.25) + 1, 0.25,
+                         20, is_asd_file=True)
 
 
-# challenge_fname = 'example_timeseries_'
-# example_fname_log = 'out_logfile_example'
+
+# calculate the SNR and duration of each signal
+opt_snr_L1 = []
+siglens = []
+for i in range(n_injections):
+	# approximate
+	hp, _ = pycbc.waveform.get_td_waveform(approximant=apx, mass1=mass1[i], mass2=mass2[i],
+	                         f_lower=30, delta_t=1/4096, inclination=inc[i],
+	                         distance=distance[i])
+
+	template = hp.cyclic_time_shift(hp.start_time)
+
+	L1_psd = pycbc.psd.interpolate(L1_psd, hp.delta_f)
+	H1_psd = pycbc.psd.interpolate(H1_psd, hp.delta_f)
+
+	L1_SNR = max(np.abs(pycbc.filter.matched_filter(template, hp, psd = L1_psd, low_frequency_cutoff = 30).crop(0.1, 0.1)))
+	dur = pycbc.waveform.compress.rough_time_estimate(mass1[i], mass1[i], 30)
+
+	opt_snr_L1.append(L1_SNR)
+	siglens.append(dur)
 
 
-# L1_example_timeseries = generate_noise_timeseries(PSD_DIR, PSD_fnames[1], example_gps, duration, 
-# 															random_seed = example_seed, f_low = 10.0, 
-# 															delta_f = 0.25, fmax = 4096, 
-# 															is_asd_file=True, plot_psd = False,
-# 															plot_timeseries = False)
+challenge_fname = 'challenge_timeseries_'
+fname_log = 'challenge_logfile'
 
-# H1_example_timeseries = generate_noise_timeseries(PSD_DIR, PSD_fnames[0], example_gps, duration, 
-# 															random_seed = example_seed, f_low = 10.0, 
-# 															delta_f = 0.25, fmax = 4096, 
-# 															is_asd_file=True, plot_psd = False,
-# 															plot_timeseries = False)
 
-# L1_example_with_injection = inject_waveform_to_timeseries(L1_example_timeseries, "L1",
-# 													 ra, dec, pol, inc, distance, 
-# 													mass1, mass2, example_gps, example_injection_time)
-# H1_example_with_injection = inject_waveform_to_timeseries(H1_example_timeseries, "H1",
-# 													 ra, dec, pol, inc, distance, 
-# 													mass1, mass2, example_gps, example_injection_time)
+L1_example_timeseries = generate_noise_timeseries(PSD_DIR, PSD_fnames[1], challenge_gps, duration, 
+															random_seed = challenge_seed, f_low = 10.0, 
+															delta_f = 0.25, fmax = 4096, 
+															is_asd_file=True, plot_psd = False,
+															plot_timeseries = False)
 
-# for this_timeseries, this_detector, this_psd in zip([L1_example_with_injection, H1_example_with_injection], 
-# 													['L1', 'H1'], [PSD_fnames[1], PSD_fnames[0]]):
+H1_example_timeseries = generate_noise_timeseries(PSD_DIR, PSD_fnames[0], challenge_gps, duration, 
+															random_seed = challenge_seed, f_low = 10.0, 
+															delta_f = 0.25, fmax = 4096, 
+															is_asd_file=True, plot_psd = False,
+															plot_timeseries = False)
 
-# 	save_data_and_generate_log_file(OUT_DIR, example_fname+this_detector, example_fname_log, 
-# 									this_timeseries, PSD_DIR, this_psd, 
-# 									example_gps, duration, 
-# 									ra, dec, pol, inc, distance, 
-# 									mass1, mass2, example_injection_time)
+for i in range(n_injections):
+
+	L1_example_with_injection = inject_waveform_to_timeseries(L1_example_timeseries, "L1",
+														 ra[i], dec[i], pol[i], inc[i], distance[i], 
+														mass1[i], mass2[i], challenge_gps, injection_times[i], 
+														spin1z = spin1z[i], spin2z = spin2z[i])
+	H1_example_with_injection = inject_waveform_to_timeseries(H1_example_timeseries, "H1",
+														 ra[i], dec[i], pol[i], inc[i], distance[i], 
+														mass1[i], mass2[i], challenge_gps, injection_times[i], 
+														spin1z = spin1z[i], spin2z = spin2z[i])
+
+for this_timeseries, this_detector, this_psd in zip([L1_example_with_injection, H1_example_with_injection], 
+													['L1', 'H1'], [PSD_fnames[1], PSD_fnames[0]]):
+
+	save_data_and_generate_log_file(OUT_DIR, challenge_fname+this_detector, None, 
+									this_timeseries, None, None, 
+									 None,  None, 
+									 None,  None,  None,  None,  None, 
+									 None,  None,  None, multi_inj = True)
+
+	columns_out = ['injection_time', 'mass1', 'mass2', 'distance', 
+					'optsnr_L1', 'duration', 'ra', 'dec', 'inc', 'pol', 'spin1z', 'spin2z']
+
+	data_out = np.column_stack([injection_times, mass1, mass2, distance,
+								opt_snr_L1, siglens, ra, dec, inc, pol, spin1z, spin2z])
+
+	logfile_fname = os.path.join(OUT_DIR, fname_log)
+
+	out_df = pd.DataFrame(data_out, columns = columns_out)
+	out_df.to_csv(logfile_fname+'.csv')
+
+
 
