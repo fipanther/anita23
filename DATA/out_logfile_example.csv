@@ -1,0 +1,12 @@
+filename:,/Users/fipanther/Documents/Work/teaching/anita23/DATA/example_timeseries_L1.txt
+psd:,/Users/fipanther/Documents/Work/teaching/anita23/input_data/aligo_O3actual_H1.txt
+gps_segment_start:,1243350018
+duration:,128
+ra:,1.7
+dec:,1.7
+polarization:,0.4
+inclination:,0
+distance:,150
+mass1:,30
+mass2:,30
+injection_time:,40
